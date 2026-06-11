@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MahaConnect AI – Trilingual Translation Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+Telugu:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       DESIGN TOKENS
+       Palette: deep indigo night sky + saffron accent +
+       jade green secondary, inspired by the tricolour and
+       Telugu script's circular geometry.
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    :root {
+      --bg-base:        #0d0f1a;
+      --bg-card:        #141728;
+      --bg-card-hover:  #1c2035;
+      --bg-input:       #1a1e30;
+      --bg-glass:       rgba(20, 23, 40, 0.85);
+
+      --accent-saffron: #f4802a;
+      --accent-saffron-light: #fba04b;
+      --accent-jade:    #1ec8a0;
+      --accent-jade-light: #3ddab5;
+      --accent-indigo:  #6f7ef7;
+      --accent-indigo-light: #99a6ff;
+
+      --text-primary:   #eef0fa;
+      --text-secondary: #8e95b8;
+      --text-muted:     #555e80;
+
+      --border-subtle:  rgba(110, 126, 247, 0.15);
+      --border-glow:    rgba(110, 126, 247, 0.45);
+      --shadow-card:    0 4px 32px rgba(0,0,0,0.45);
+      --shadow-glow:    0 0 40px rgba(110, 126, 247, 0.12);
+
+      --radius-sm:  6px;
+      --radius-md:  12px;
+      --radius-lg:  18px;
+      --radius-xl:  24px;
+
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body:    'Noto Sans', sans-serif;
+      --font-indic:   'Noto Sans Devanagari', 'Noto Sans Telugu', sans-serif;
+
+      --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESET & BASE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ambient grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(110,126,247,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(110,126,247,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LAYOUT SHELL
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HEADER / HERO
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .site-header {
+      padding: 44px 0 32px;
+      text-align: center;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 100px;
+      padding: 6px 18px 6px 10px;
+      margin-bottom: 28px;
+    }
+
+    .logo-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-saffron), var(--accent-indigo));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .hero-headline .accent-saffron { color: var(--accent-saffron); }
+    .hero-headline .accent-jade    { color: var(--accent-jade); }
+    .hero-headline .accent-indigo  { color: var(--accent-indigo); }
+
+    .hero-subline {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 540px;
+      margin: 0 auto 32px;
+    }
+
+    /* tri-script showcase */
+    .script-trio {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .script-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-size: 15px;
+      font-family: var(--font-indic);
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .script-pill.active,
+    .script-pill:hover {
+      border-color: var(--accent-indigo);
+      color: var(--accent-indigo-light);
+      background: rgba(110, 126, 247, 0.08);
+    }
+
+    .script-pill .lang-code {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-left: 6px;
+      text-transform: uppercase;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TABS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 5px;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .tab-btn .tab-icon { font-size: 16px; }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(110,126,247,0.25), rgba(110,126,247,0.12));
+      color: var(--accent-indigo-light);
+      border: 1px solid rgba(110, 126, 247, 0.35);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       CARDS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-card);
+      transition: var(--transition);
+    }
+
+    .card:hover {
+      border-color: var(--border-glow);
+      box-shadow: var(--shadow-card), var(--shadow-glow);
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LANGUAGE SELECTOR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .lang-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .lang-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .lang-select-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      flex-wrap: wrap;
+    }
+
+    .lang-select {
+      flex: 1;
+      min-width: 140px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 14px;
+      padding: 10px 14px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238e95b8' width='16' height='16'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 34px;
+      transition: var(--transition);
+    }
+
+    .lang-select:focus {
+      outline: none;
+      border-color: var(--accent-indigo);
+      box-shadow: 0 0 0 3px rgba(110, 126, 247, 0.15);
+    }
+
+    .swap-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      padding: 10px 13px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .swap-btn:hover {
+      background: rgba(110, 126, 247, 0.15);
+      border-color: var(--accent-indigo);
+      color: var(--accent-indigo-light);
+      transform: rotate(180deg);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TEXTAREA
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .text-area-wrapper {
+      position: relative;
+    }
+
+    .text-area {
+      width: 100%;
+      min-height: 140px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: var(--font-indic);
+      font-size: 16px;
+      line-height: 1.7;
+      padding: 16px;
+      resize: vertical;
+      transition: var(--transition);
+    }
+
+    .text-area::placeholder { color: var(--text-muted); }
+
+    .text-area:focus {
+      outline: none;
+      border-color: var(--accent-indigo);
+      box-shadow: 0 0 0 3px rgba(110, 126, 247, 0.12);
+    }
+
+    .char-counter {
+      position: absolute;
+      bottom: 10px;
+      right: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      pointer-events: none;
+    }
+
+    .char-counter.warn { color: var(--accent-saffron); }
+    .char-counter.error { color: #f45b5b; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       BUTTONS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-indigo), #8b5cf6);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(110, 126, 247, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(110, 126, 247, 0.5);
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+      border-color: var(--border-glow);
+    }
+
+    .btn-jade {
+      background: linear-gradient(135deg, var(--accent-jade), #0fa779);
+      color: #0d0f1a;
+      box-shadow: 0 4px 16px rgba(30, 200, 160, 0.3);
+    }
+
+    .btn-jade:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(30, 200, 160, 0.45);
+    }
+
+    .btn-saffron {
+      background: linear-gradient(135deg, var(--accent-saffron), #e06b1a);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(244, 128, 42, 0.3);
+    }
+
+    .btn-saffron:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(244, 128, 42, 0.45);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESULT BOX
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .result-box {
+      margin-top: 20px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      min-height: 80px;
+      padding: 18px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .result-box.has-content {
+      border-color: rgba(30, 200, 160, 0.3);
+    }
+
+    .result-label {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .result-text {
+      font-family: var(--font-indic);
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .detected-lang-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(110, 126, 247, 0.12);
+      border: 1px solid rgba(110, 126, 247, 0.25);
+      border-radius: 100px;
+      padding: 3px 10px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-indigo-light);
+      margin-bottom: 10px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LOADING SPINNER
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TOAST NOTIFICATIONS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      border-left: 3px solid var(--accent-jade);
+      box-shadow: var(--shadow-card);
+      max-width: 340px;
+      animation: toastIn 0.3s ease forwards;
+      pointer-events: auto;
+    }
+
+    .toast.error { border-left-color: #f45b5b; }
+    .toast.warning { border-left-color: var(--accent-saffron); }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(40px); }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       AUDIO PANEL
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .audio-player-wrapper {
+      margin-top: 14px;
+      display: none;
+    }
+
+    .audio-player-wrapper.visible { display: block; }
+
+    audio {
+      width: 100%;
+      border-radius: var(--radius-sm);
+      filter: invert(0);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       VOICE INPUT PANEL
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .mic-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+    }
+
+    .mic-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .mic-dot.recording {
+      background: #f45b5b;
+      animation: pulse-red 1s ease infinite;
+    }
+
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(244,91,91,0.6); }
+      50%       { box-shadow: 0 0 0 6px rgba(244,91,91,0); }
+    }
+
+    .mic-label {
+      font-family: var(--font-display);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .waveform-bars {
+      display: none;
+      align-items: center;
+      gap: 3px;
+      height: 20px;
+    }
+
+    .waveform-bars.visible { display: flex; }
+
+    .waveform-bar {
+      width: 3px;
+      border-radius: 2px;
+      background: var(--accent-indigo);
+    }
+
+    .waveform-bar:nth-child(1) { animation: wave 0.9s ease-in-out infinite; height: 10px; }
+    .waveform-bar:nth-child(2) { animation: wave 0.9s ease-in-out 0.1s infinite; height: 16px; }
+    .waveform-bar:nth-child(3) { animation: wave 0.9s ease-in-out 0.2s infinite; height: 20px; }
+    .waveform-bar:nth-child(4) { animation: wave 0.9s ease-in-out 0.15s infinite; height: 14px; }
+    .waveform-bar:nth-child(5) { animation: wave 0.9s ease-in-out 0.05s infinite; height: 8px; }
+
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.5); opacity: 0.6; }
+      50%       { transform: scaleY(1.0); opacity: 1; }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FEATURE PILLS ROW (bottom attribution)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .features-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 48px;
+    }
+
+    .feature-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .feature-pill .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       UTILITY
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .hidden { display: none !important; }
+
+    .divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 24px 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 660px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .tabs { flex-direction: column; }
+      .tab-btn { justify-content: flex-start; }
+      .lang-row { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       UPLOAD ZONE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .upload-zone {
+      border: 2px dashed var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 16px;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--accent-indigo);
+      background: rgba(110, 126, 247, 0.06);
+    }
+
+    .upload-icon { font-size: 28px; margin-bottom: 8px; }
+
+    .upload-zone p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .upload-zone .upload-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    #stt-file-input { display: none; }
+
+    .file-chosen {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: rgba(30,200,160,0.1);
+      border: 1px solid rgba(30,200,160,0.3);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--accent-jade-light);
+      margin-bottom: 16px;
+    }
+
+    .file-chosen.visible { display: flex; }
+  </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="page-wrapper">
+
+  <!-- ─── HEADER ─────────────────────────────────── -->
+  <header class="site-header">
+    <div class="logo-badge">
+      <div class="logo-dot">🕉</div>
+      <span class="logo-text">Powered by Sarvam AI</span>
+    </div>
+
+    <h1 class="hero-headline">
+      <span class="accent-saffron">మహా</span><span class="accent-jade">कनेक्ट</span>
+      <span class="accent-indigo"> AI</span>
+    </h1>
+    <p class="hero-subline">
+      Context-aware speech and text translation bridging Telugu, Hindi, and English —
+      built on India's own language intelligence.
+    </p>
+
+    <div class="script-trio">
+      <div class="script-pill active">
+        తెలుగు <span class="lang-code">te-IN</span>
+      </div>
+      <div class="script-pill" style="color: var(--text-muted); font-size:18px;">⇌</div>
+      <div class="script-pill">
+        हिन्दी <span class="lang-code">hi-IN</span>
+      </div>
+      <div class="script-pill" style="color: var(--text-muted); font-size:18px;">⇌</div>
+      <div class="script-pill">
+        English <span class="lang-code">en-IN</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── TABS ──────────────────────────────────── -->
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" role="tab" data-tab="text-translate" onclick="switchTab(this, 'text-translate')">
+      <span class="tab-icon">📝</span> Text Translation
+    </button>
+    <button class="tab-btn" role="tab" data-tab="voice-stt" onclick="switchTab(this, 'voice-stt')">
+      <span class="tab-icon">🎙️</span> Voice → Text
+    </button>
+    <button class="tab-btn" role="tab" data-tab="tts-panel" onclick="switchTab(this, 'tts-panel')">
+      <span class="tab-icon">🔊</span> Text → Speech
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       TAB 1 — TEXT TRANSLATION
+  ══════════════════════════════════════════════ -->
+  <div id="text-translate" class="tab-panel active">
+    <div class="card">
+      <div class="card-title">Translate Text</div>
+
+      <!-- Language selector row -->
+      <div class="lang-row">
+        <span class="lang-label">From</span>
+        <div class="lang-select-group">
+          <select id="tt-source" class="lang-select" onchange="updateTTSwap()">
+            <option value="auto">Auto-Detect</option>
+            <option value="en-IN">English (en-IN)</option>
+            <option value="hi-IN">Hindi (hi-IN)</option>
+            <option value="te-IN" selected>Telugu (te-IN)</option>
+          </select>
+          <button class="swap-btn" title="Swap languages" onclick="swapLanguages()">⇄</button>
+          <select id="tt-target" class="lang-select" onchange="updateTTSwap()">
+            <option value="en-IN" selected>English (en-IN)</option>
+            <option value="hi-IN">Hindi (hi-IN)</option>
+            <option value="te-IN">Telugu (te-IN)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="text-area-wrapper">
+        <textarea
+          id="tt-input"
+          class="text-area"
+          placeholder="Type or paste text here… (తెలుగు, हिन्दी, or English)"
+          maxlength="2000"
+          oninput="updateCharCount(this, 'tt-char-count', 2000)"
+        ></textarea>
+        <span id="tt-char-count" class="char-counter">0 / 2000</span>
+      </div>
+
+      <!-- Buttons -->
+      <div class="btn-row">
+        <button class="btn btn-primary" id="tt-translate-btn" onclick="translateText()">
+          <span class="tab-icon">⚡</span> Translate
+        </button>
+        <button class="btn btn-secondary" onclick="clearTranslation()">Clear</button>
+        <button class="btn btn-secondary" onclick="detectLang()">
+          🔍 Detect Language
+        </button>
+      </div>
+
+      <!-- Result -->
+      <div id="tt-result" class="result-box hidden">
+        <div id="tt-detected-badge" class="detected-lang-badge hidden">
+          🌐 Detected: <span id="tt-detected-label"></span>
+        </div>
+        <div class="result-label">Translation</div>
+        <div id="tt-result-text" class="result-text"></div>
+        <div class="result-actions">
+          <button class="btn btn-secondary" style="font-size:12px; padding:7px 14px;" onclick="copyResult('tt-result-text')">
+            📋 Copy
+          </button>
+          <button class="btn btn-jade" style="font-size:12px; padding:7px 14px;" onclick="speakResultFromTranslation()">
+            🔊 Speak Translation
+          </button>
+        </div>
+        <div id="tt-audio-player" class="audio-player-wrapper">
+          <audio id="tt-audio" controls></audio>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       TAB 2 — VOICE (STT) → TEXT → TRANSLATE
+  ══════════════════════════════════════════════ -->
+  <div id="voice-stt" class="tab-panel">
+    <div class="card">
+      <div class="card-title">Speech to Text — Then Translate</div>
+
+      <!-- Language hints -->
+      <div class="lang-row">
+        <span class="lang-label">Audio Language (hint)</span>
+        <select id="stt-lang" class="lang-select" style="max-width: 260px;">
+          <option value="unknown">Auto-Detect</option>
+          <option value="en-IN">English (en-IN)</option>
+          <option value="hi-IN">Hindi (hi-IN)</option>
+          <option value="te-IN">Telugu (te-IN)</option>
+        </select>
+      </div>
+
+      <!-- Mic record button -->
+      <div class="mic-status">
+        <div id="mic-dot" class="mic-dot"></div>
+        <span id="mic-label" class="mic-label">Ready to record — click "Start Recording" below</span>
+        <div id="waveform-bars" class="waveform-bars">
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-saffron" id="record-btn" onclick="toggleRecording()">
+          🎙️ Start Recording
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- OR upload audio file -->
+      <div
+        class="upload-zone"
+        id="upload-zone"
+        onclick="document.getElementById('stt-file-input').click()"
+        ondragover="onDragOver(event)"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event)"
+      >
+        <div class="upload-icon">🎵</div>
+        <p>Drop an audio file here or click to browse</p>
+        <p class="upload-hint">WAV, MP3, OGG, FLAC, M4A — max 25 MB</p>
+      </div>
+      <input type="file" id="stt-file-input" accept="audio/*" onchange="handleFileSelect(event)" />
+
+      <div id="file-chosen" class="file-chosen">
+        <span>📎</span>
+        <span id="chosen-filename">No file</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="stt-transcribe-btn" onclick="transcribeAudio()">
+          <span>📝</span> Transcribe Audio
+        </button>
+      </div>
+
+      <!-- Transcript result -->
+      <div id="stt-result" class="result-box hidden" style="margin-top:20px;">
+        <div id="stt-detected-badge" class="detected-lang-badge hidden">
+          🌐 Detected: <span id="stt-detected-label"></span>
+        </div>
+        <div class="result-label">Transcript</div>
+        <div id="stt-result-text" class="result-text"></div>
+        <div class="result-actions" style="margin-top:14px;">
+          <button class="btn btn-secondary" style="font-size:12px; padding:7px 14px;" onclick="copyResult('stt-result-text')">
+            📋 Copy
+          </button>
+          <button class="btn btn-primary" style="font-size:12px; padding:7px 14px;" onclick="sendToTranslator()">
+            ⚡ Send to Translator
+          </button>
+        </div>
+      </div>
+
+      <!-- Translate transcript inline -->
+      <div id="stt-translate-section" class="hidden" style="margin-top:20px;">
+        <div class="divider"></div>
+        <div class="card-title">Translate Transcript</div>
+        <div class="lang-row">
+          <span class="lang-label">Translate To</span>
+          <select id="stt-target-lang" class="lang-select" style="max-width:260px;">
+            <option value="en-IN">English (en-IN)</option>
+            <option value="hi-IN">Hindi (hi-IN)</option>
+            <option value="te-IN">Telugu (te-IN)</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-jade" onclick="translateTranscript()">
+            ⚡ Translate Transcript
+          </button>
+        </div>
+        <div id="stt-translation-result" class="result-box hidden" style="margin-top:16px;">
+          <div class="result-label">Translation</div>
+          <div id="stt-translation-text" class="result-text"></div>
+          <div class="result-actions">
+            <button class="btn btn-secondary" style="font-size:12px; padding:7px 14px;" onclick="copyResult('stt-translation-text')">
+              📋 Copy
+            </button>
+            <button class="btn btn-jade" style="font-size:12px; padding:7px 14px;" onclick="speakSttTranslation()">
+              🔊 Speak
+            </button>
+          </div>
+          <div id="stt-audio-player" class="audio-player-wrapper">
+            <audio id="stt-audio" controls></audio>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       TAB 3 — TEXT TO SPEECH
+  ══════════════════════════════════════════════ -->
+  <div id="tts-panel" class="tab-panel">
+    <div class="card">
+      <div class="card-title">Text to Speech</div>
+
+      <div class="lang-row">
+        <span class="lang-label">Speak In</span>
+        <select id="tts-lang" class="lang-select" style="max-width:260px;">
+          <option value="en-IN">English (en-IN)</option>
+          <option value="hi-IN">Hindi (hi-IN)</option>
+          <option value="te-IN">Telugu (te-IN)</option>
+        </select>
+      </div>
+
+      <div class="text-area-wrapper">
+        <textarea
+          id="tts-input"
+          class="text-area"
+          placeholder="Enter text to speak aloud… (2500 chars max)"
+          maxlength="2500"
+          oninput="updateCharCount(this, 'tts-char-count', 2500)"
+        ></textarea>
+        <span id="tts-char-count" class="char-counter">0 / 2500</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-jade" id="tts-speak-btn" onclick="speakText()">
+          🔊 Generate Speech
+        </button>
+        <button class="btn btn-secondary" onclick="clearTTS()">Clear</button>
+      </div>
+
+      <div id="tts-audio-player" class="audio-player-wrapper" style="margin-top:20px;">
+        <div class="result-label" style="margin-bottom:10px;">Generated Audio</div>
+        <audio id="tts-audio" controls style="width:100%;"></audio>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn btn-secondary" style="font-size:12px; padding:7px 14px;" onclick="downloadTTSAudio()">
+            ⬇️ Download WAV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FEATURE PILLS ──────────────────────────── -->
+  <div class="features-row">
+    <div class="feature-pill">
+      <div class="pill-dot" style="background:var(--accent-saffron);"></div>
+      mayura:v1 Translation
+    </div>
+    <div class="feature-pill">
+      <div class="pill-dot" style="background:var(--accent-indigo);"></div>
+      sarvam-translate:v1
+    </div>
+    <div class="feature-pill">
+      <div class="pill-dot" style="background:var(--accent-jade);"></div>
+      saarika:v2.5 STT
+    </div>
+    <div class="feature-pill">
+      <div class="pill-dot" style="background:#c084fc;"></div>
+      bulbul:v3 TTS
+    </div>
+    <div class="feature-pill">
+      <div class="pill-dot" style="background:#f87171;"></div>
+      Auto Language Detection
+    </div>
+  </div>
+
+</div><!-- /page-wrapper -->
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════ -->
+<script>
+"use strict";
+
+// ─────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────
+let mediaRecorder    = null;
+let audioChunks      = [];
+let isRecording      = false;
+let selectedAudioFile = null;   // File object from upload
+let recordedAudioBlob = null;   // Blob from microphone recording
+let ttsAudioBase64   = null;    // For download
+
+// ─────────────────────────────────────────────
+// Tab switching
+// ─────────────────────────────────────────────
+function switchTab(btnEl, tabId) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  btnEl.classList.add("active");
+  document.getElementById(tabId).classList.add("active");
+}
+
+// ─────────────────────────────────────────────
+// Char counter
+// ─────────────────────────────────────────────
+function updateCharCount(textarea, counterId, max) {
+  const len = textarea.value.length;
+  const el  = document.getElementById(counterId);
+  el.textContent = `${len} / ${max}`;
+  el.className = "char-counter";
+  if (len > max * 0.9) el.classList.add("warn");
+  if (len >= max)      el.classList.add("error");
+}
+
+// ─────────────────────────────────────────────
+// Toast
+// ─────────────────────────────────────────────
+function showToast(message, type = "success", duration = 4000) {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = "toastOut 0.3s ease forwards";
+    setTimeout(() => toast.remove(), 320);
+  }, duration);
+}
+
+// ─────────────────────────────────────────────
+// Button loading state
+// ─────────────────────────────────────────────
+function setLoading(btnId, loading, originalHTML) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (loading) {
+    btn.disabled = true;
+    btn.dataset.original = btn.innerHTML;
+    btn.innerHTML = `<span class="spinner"></span> Processing…`;
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.original || originalHTML;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Copy to clipboard
+// ─────────────────────────────────────────────
+function copyResult(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el || !el.textContent.trim()) {
+    showToast("Nothing to copy.", "warning"); return;
+  }
+  navigator.clipboard.writeText(el.textContent.trim())
+    .then(() => showToast("Copied to clipboard!"))
+    .catch(() => showToast("Could not copy — please select and copy manually.", "error"));
+}
+
+// ─────────────────────────────────────────────
+// Language swap (text translation tab)
+// ─────────────────────────────────────────────
+function swapLanguages() {
+  const src = document.getElementById("tt-source");
+  const tgt = document.getElementById("tt-target");
+  if (src.value === "auto") { showToast("Cannot swap when source is Auto-Detect.", "warning"); return; }
+  const tmpVal = src.value;
+  src.value = tgt.value;
+  tgt.value = tmpVal;
+  // Also swap text if a translation is already shown
+  const inputArea = document.getElementById("tt-input");
+  const resultText = document.getElementById("tt-result-text").textContent.trim();
+  if (resultText) {
+    inputArea.value = resultText;
+    updateCharCount(inputArea, "tt-char-count", 2000);
+    document.getElementById("tt-result").classList.add("hidden");
+  }
+}
+
+function updateTTSwap() {
+  // Prevent source == target (when not auto)
+  const src = document.getElementById("tt-source").value;
+  const tgt = document.getElementById("tt-target").value;
+  if (src !== "auto" && src === tgt) {
+    // Set target to first different language
+    const opts = ["en-IN", "hi-IN", "te-IN"].filter(l => l !== src);
+    document.getElementById("tt-target").value = opts[0];
+  }
+}
+
+// ─────────────────────────────────────────────
+// TEXT TRANSLATION
+// ─────────────────────────────────────────────
+async function translateText() {
+  const text   = document.getElementById("tt-input").value.trim();
+  const source = document.getElementById("tt-source").value;
+  const target = document.getElementById("tt-target").value;
+
+  if (!text) { showToast("Please enter some text to translate.", "warning"); return; }
+
+  setLoading("tt-translate-btn", true);
+
+  try {
+    const res = await fetch("/api/translate", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ text, source, target }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      showToast(data.error || "Translation failed. Check your API key and try again.", "error");
+      return;
+    }
+
+    // Show result
+    document.getElementById("tt-result-text").textContent = data.translated_text;
+    const resultBox = document.getElementById("tt-result");
+    resultBox.classList.remove("hidden");
+    resultBox.classList.add("has-content");
+
+    // Detected lang badge (when source was auto)
+    if (source === "auto" && data.detected_language) {
+      document.getElementById("tt-detected-label").textContent =
+        `${data.detected_language_label} (${data.detected_language})`;
+      document.getElementById("tt-detected-badge").classList.remove("hidden");
+    } else {
+      document.getElementById("tt-detected-badge").classList.add("hidden");
+    }
+
+    // Hide old audio
+    document.getElementById("tt-audio-player").classList.remove("visible");
+
+    showToast("Translation complete!");
+  } catch (err) {
+    showToast("Network error — is the Flask server running?", "error");
+  } finally {
+    setLoading("tt-translate-btn", false);
+  }
+}
+
+function clearTranslation() {
+  document.getElementById("tt-input").value = "";
+  document.getElementById("tt-char-count").textContent = "0 / 2000";
+  document.getElementById("tt-result").classList.add("hidden");
+  document.getElementById("tt-audio-player").classList.remove("visible");
+}
+
+async function detectLang() {
+  const text = document.getElementById("tt-input").value.trim();
+  if (!text) { showToast("Enter some text first.", "warning"); return; }
+
+  try {
+    const res = await fetch("/api/detect_language", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ text }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { showToast(data.error || "Detection failed.", "error"); return; }
+    showToast(`Detected: ${data.language_label} (${data.language_code})`);
+  } catch (err) {
+    showToast("Network error.", "error");
+  }
+}
+
+// ─────────────────────────────────────────────
+// SPEAK TRANSLATION RESULT (tab 1)
+// ─────────────────────────────────────────────
+async function speakResultFromTranslation() {
+  const text     = document.getElementById("tt-result-text").textContent.trim();
+  const language = document.getElementById("tt-target").value;
+  if (!text) { showToast("No translation to speak.", "warning"); return; }
+  await callTTS(text, language, "tt-audio", "tt-audio-player");
+}
+
+// ─────────────────────────────────────────────
+// VOICE RECORDING (tab 2)
+// ─────────────────────────────────────────────
+async function toggleRecording() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    await startRecording();
+  }
+}
+
+async function startRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showToast("Microphone access not supported in this browser. Use Chrome or Edge.", "error");
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    recordedAudioBlob = null;
+
+    // Prefer webm/opus; fall back to whatever browser supports
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+      ? "audio/webm;codecs=opus"
+      : MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "";
+
+    mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+      recordedAudioBlob = blob;
+      selectedAudioFile = null; // recorded takes priority over uploaded
+      showToast("Recording saved — click Transcribe Audio.");
+      stream.getTracks().forEach(track => track.stop());
+    };
+
+    mediaRecorder.start(100);
+    isRecording = true;
+
+    // UI
+    document.getElementById("record-btn").textContent = "⏹ Stop Recording";
+    document.getElementById("record-btn").className = "btn btn-secondary";
+    document.getElementById("mic-dot").classList.add("recording");
+    document.getElementById("mic-label").textContent = "Recording… speak now";
+    document.getElementById("waveform-bars").classList.add("visible");
+
+  } catch (err) {
+    showToast(
+      err.name === "NotAllowedError"
+        ? "Microphone permission denied. Please allow it in your browser."
+        : `Could not access microphone: ${err.message}`,
+      "error"
+    );
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+  }
+  isRecording = false;
+
+  document.getElementById("record-btn").innerHTML = "🎙️ Start Recording";
+  document.getElementById("record-btn").className = "btn btn-saffron";
+  document.getElementById("mic-dot").classList.remove("recording");
+  document.getElementById("mic-label").textContent = "Recording saved. Click Transcribe Audio.";
+  document.getElementById("waveform-bars").classList.remove("visible");
+}
+
+// ─────────────────────────────────────────────
+// FILE UPLOAD (tab 2)
+// ─────────────────────────────────────────────
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  selectedAudioFile = file;
+  recordedAudioBlob = null;
+  document.getElementById("chosen-filename").textContent = file.name;
+  document.getElementById("file-chosen").classList.add("visible");
+  showToast(`File selected: ${file.name}`);
+}
+
+function onDragOver(event) {
+  event.preventDefault();
+  document.getElementById("upload-zone").classList.add("drag-over");
+}
+
+function onDragLeave(event) {
+  document.getElementById("upload-zone").classList.remove("drag-over");
+}
+
+function onDrop(event) {
+  event.preventDefault();
+  document.getElementById("upload-zone").classList.remove("drag-over");
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  if (!file.type.startsWith("audio/")) {
+    showToast("Please drop an audio file.", "warning"); return;
+  }
+  selectedAudioFile = file;
+  recordedAudioBlob = null;
+  document.getElementById("chosen-filename").textContent = file.name;
+  document.getElementById("file-chosen").classList.add("visible");
+  showToast(`File dropped: ${file.name}`);
+}
+
+// ─────────────────────────────────────────────
+// TRANSCRIPTION (tab 2)
+// ─────────────────────────────────────────────
+async function transcribeAudio() {
+  const audioToSend = recordedAudioBlob || selectedAudioFile;
+  if (!audioToSend) {
+    showToast("Please record audio or upload a file first.", "warning"); return;
+  }
+
+  const language = document.getElementById("stt-lang").value;
+
+  setLoading("stt-transcribe-btn", true);
+
+  try {
+    const formData = new FormData();
+
+    if (audioToSend instanceof Blob) {
+      // recorded blob — determine extension from MIME type
+      const mime = audioToSend.type || "audio/webm";
+      const ext  = mime.includes("ogg") ? ".ogg"
+                 : mime.includes("mp4") ? ".mp4"
+                 : mime.includes("wav") ? ".wav"
+                 : ".webm";
+      formData.append("file", audioToSend, `recording${ext}`);
+    } else {
+      formData.append("file", audioToSend, audioToSend.name);
+    }
+
+    formData.append("language", language);
+
+    const res = await fetch("/api/transcribe", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      showToast(data.error || "Transcription failed.", "error"); return;
+    }
+
+    // Show transcript
+    document.getElementById("stt-result-text").textContent = data.transcript;
+    const resultBox = document.getElementById("stt-result");
+    resultBox.classList.remove("hidden");
+    resultBox.classList.add("has-content");
+
+    if (data.language_code && data.language_code !== "unknown") {
+      document.getElementById("stt-detected-label").textContent =
+        `${data.language_label} (${data.language_code})`;
+      document.getElementById("stt-detected-badge").classList.remove("hidden");
+    }
+
+    showToast("Transcription complete!");
+  } catch (err) {
+    showToast("Network error — is the Flask server running?", "error");
+  } finally {
+    setLoading("stt-transcribe-btn", false);
+  }
+}
+
+// Send transcript to translation tab
+function sendToTranslator() {
+  const text = document.getElementById("stt-result-text").textContent.trim();
+  if (!text) return;
+  document.getElementById("tt-input").value = text;
+  updateCharCount(document.getElementById("tt-input"), "tt-char-count", 2000);
+  switchTab(document.querySelector('[data-tab="text-translate"]'), "text-translate");
+  showToast("Transcript sent to Text Translation tab.");
+}
+
+// Show inline translate section
+function showSTTTranslateSection() {
+  document.getElementById("stt-translate-section").classList.remove("hidden");
+}
+
+async function translateTranscript() {
+  const text   = document.getElementById("stt-result-text").textContent.trim();
+  const target = document.getElementById("stt-target-lang").value;
+  if (!text) { showToast("No transcript to translate.", "warning"); return; }
+
+  try {
+    const res  = await fetch("/api/translate", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ text, source: "auto", target }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { showToast(data.error || "Translation failed.", "error"); return; }
+
+    document.getElementById("stt-translation-text").textContent = data.translated_text;
+    document.getElementById("stt-translation-result").classList.remove("hidden");
+    document.getElementById("stt-audio-player").classList.remove("visible");
+    showToast("Translation complete!");
+  } catch (err) {
+    showToast("Network error.", "error");
+  }
+}
+
+// Make "Send to Translator" button also show the inline section
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.querySelector("#stt-result .result-actions .btn-primary");
+  if (btn) {
+    const orig = btn.onclick;
+    btn.onclick = () => { if (orig) orig(); showSTTTranslateSection(); };
+  }
+});
+
+async function speakSttTranslation() {
+  const text     = document.getElementById("stt-translation-text").textContent.trim();
+  const language = document.getElementById("stt-target-lang").value;
+  if (!text) { showToast("No translation to speak.", "warning"); return; }
+  await callTTS(text, language, "stt-audio", "stt-audio-player");
+}
+
+// ─────────────────────────────────────────────
+// TEXT TO SPEECH — Tab 3
+// ─────────────────────────────────────────────
+async function speakText() {
+  const text     = document.getElementById("tts-input").value.trim();
+  const language = document.getElementById("tts-lang").value;
+  if (!text) { showToast("Please enter text to speak.", "warning"); return; }
+
+  setLoading("tts-speak-btn", true);
+
+  try {
+    const base64 = await fetchTTSAudio(text, language);
+    if (!base64) return;
+
+    ttsAudioBase64 = base64;
+    const audioEl  = document.getElementById("tts-audio");
+    audioEl.src    = `data:audio/wav;base64,${base64}`;
+    document.getElementById("tts-audio-player").classList.add("visible");
+    audioEl.play().catch(() => {});
+    showToast("Audio generated — press play!");
+  } catch (err) {
+    showToast("TTS failed — check your API key.", "error");
+  } finally {
+    setLoading("tts-speak-btn", false);
+  }
+}
+
+function clearTTS() {
+  document.getElementById("tts-input").value = "";
+  document.getElementById("tts-char-count").textContent = "0 / 2500";
+  document.getElementById("tts-audio-player").classList.remove("visible");
+  ttsAudioBase64 = null;
+}
+
+function downloadTTSAudio() {
+  if (!ttsAudioBase64) { showToast("No audio to download.", "warning"); return; }
+  const link = document.createElement("a");
+  link.href = `data:audio/wav;base64,${ttsAudioBase64}`;
+  link.download = "mahaconnect_speech.wav";
+  link.click();
+}
+
+// ─────────────────────────────────────────────
+// SHARED TTS HELPER
+// ─────────────────────────────────────────────
+async function fetchTTSAudio(text, language) {
+  const res = await fetch("/api/speak", {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ text, language }),
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) {
+    showToast(data.error || "TTS failed.", "error");
+    return null;
+  }
+  return data.audio_base64;
+}
+
+async function callTTS(text, language, audioElId, playerWrapperId) {
+  const base64 = await fetchTTSAudio(text, language);
+  if (!base64) return;
+  const audioEl = document.getElementById(audioElId);
+  audioEl.src   = `data:audio/wav;base64,${base64}`;
+  document.getElementById(playerWrapperId).classList.add("visible");
+  audioEl.play().catch(() => {});
+  showToast("Audio generated — press play!");
+}
+</script>
+
+</body>
+</html>
